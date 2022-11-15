@@ -5,26 +5,6 @@ namespace WoW
 {
     public class GameController : MonoBehaviour
     {
-        #region Singleton
-
-        private static object _lock = new object();
-        private static GameController _instance;
-
-        public static GameController Instance
-        {
-            get
-            {
-                lock (_lock)
-                {
-                    if (_instance == null) _instance = (GameController)FindObjectOfType(typeof(GameController));
-
-                    return _instance;
-                }
-            }
-        }
-
-        #endregion
-
         [SerializeField] private TextAsset gameData;
         [SerializeField] private Grid grid;
 
@@ -32,6 +12,17 @@ namespace WoW
         public Level currentLevel;
         private LevelContainer levelContainer = new LevelContainer();
 
+        public static Action<Word[]> InitializeWheel;
+
+        private void OnEnable()
+        {
+            Wheel.OnWordWritten += CheckWrittenWord;
+        }
+
+        private void OnDisable()
+        {
+            Wheel.OnWordWritten -= CheckWrittenWord;
+        }
 
         public int CurrentLevelIndex
         {
@@ -61,7 +52,26 @@ namespace WoW
             }
 
             grid.InitializeGrid(new Vector2Int(currentLevel.Column, currentLevel.Row), words);
+        }
 
+        void Start()
+        {
+            InitializeWheel?.Invoke(words);
+        }
+
+        public void CheckWrittenWord(string writtenWord)
+        {
+            for (int i = 0; i < words.Length; i++)
+            {
+                Word word = words[i];
+                if (writtenWord == word.Letters)
+                {
+                    for (int j = 0; j < word.cells.Length; j++)
+                    {
+                        word.cells[j].Open();
+                    }
+                }
+            }
         }
     }
 
@@ -86,5 +96,6 @@ namespace WoW
         public int SColumn;
         public string Letters;
         public bool H;
+        public Cell[] cells;
     }
 }

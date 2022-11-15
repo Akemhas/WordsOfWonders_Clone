@@ -1,6 +1,7 @@
+using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace WoW
 {
@@ -20,6 +21,12 @@ namespace WoW
                 _letter = value;
                 letterTMP.SetText(_letter.ToString());
             }
+        }
+
+        public void Open()
+        {
+            letterTMP.gameObject.SetActive(true);
+            transform.DOScale(1.075f, .225f).SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo).SetLink(gameObject);
         }
 
         [SerializeField] private TextMeshProUGUI letterTMP;

@@ -40,21 +40,15 @@ namespace WoW
             for (int i = 0; i < words.Length; i++)
             {
                 var word = words[i];
+                word.cells = new Cell[word.Letters.Length];
 
                 for (int j = 0; j < word.Letters.Length; j++)
                 {
-                    if (word.H)
-                    {
-                        Cell cell = cells[word.SRow][j];
-                        cell.modelHolder.SetActive(true);
-                        cell.Letter = word.Letters[j];
-                    }
-                    else
-                    {
-                        Cell cell = cells[word.Letters.Length - 1 - j][word.SColumn];
-                        cell.modelHolder.SetActive(true);
-                        cell.Letter = word.Letters[j];
-                    }
+                    Cell cell = word.H ? cells[word.SRow][j] : cells[word.Letters.Length - 1 - j][word.SColumn];
+                    cell.modelHolder.SetActive(true);
+                    cell.Letter = word.Letters[j];
+
+                    word.cells[j] = cell;
                 }
             }
         }
