@@ -6,10 +6,21 @@ namespace WoW
 {
     public class Cell : MonoBehaviour, IClickable
     {
-        public Vector2 size;
+        public RectTransform rectTransform;
         public Vector2Int cellPos;
 
-        public char letter;
+        public GameObject modelHolder;
+
+        private char _letter;
+        public char Letter
+        {
+            get => _letter;
+            set
+            {
+                _letter = value;
+                letterTMP.SetText(_letter.ToString());
+            }
+        }
 
         [SerializeField] private TextMeshProUGUI letterTMP;
 

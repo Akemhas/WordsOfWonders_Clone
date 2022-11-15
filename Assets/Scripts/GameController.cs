@@ -30,7 +30,6 @@ namespace WoW
 
         public Word[] words;
         public Level currentLevel;
-
         private LevelContainer levelContainer = new LevelContainer();
 
 
@@ -60,6 +59,9 @@ namespace WoW
                 word.Letters = wordString[2];
                 word.H = wordString[3][0] == 'H';
             }
+
+            grid.InitializeGrid(new Vector2Int(currentLevel.Column, currentLevel.Row), words);
+
         }
     }
 
