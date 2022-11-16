@@ -1,35 +1,28 @@
-using System;
 using DG.Tweening;
-using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace WoW
 {
     public class Cell : MonoBehaviour, IClickable
     {
         public RectTransform rectTransform;
+        [SerializeField] private Image cellBG;
+        [SerializeField] private Color fullColor = Color.red;
+
         public Vector2Int cellPos;
 
         public GameObject modelHolder;
+        public char letter;
 
-        private char _letter;
-        public char Letter
-        {
-            get => _letter;
-            set
-            {
-                _letter = value;
-                letterTMP.SetText(_letter.ToString());
-            }
-        }
+        public bool full;
+
 
         public void Open()
         {
-            letterTMP.gameObject.SetActive(true);
             transform.DOScale(1.075f, .225f).SetEase(Ease.InOutSine).SetLoops(2, LoopType.Yoyo).SetLink(gameObject);
+            cellBG.color = fullColor;
         }
-
-        [SerializeField] private TextMeshProUGUI letterTMP;
 
         public void Click()
         {

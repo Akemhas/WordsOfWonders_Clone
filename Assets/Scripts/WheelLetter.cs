@@ -9,6 +9,8 @@ namespace WoW
         public Image raycastImage;
         [SerializeField] private TextMeshProUGUI letterTMP;
 
+        public bool selected;
+
         private char _letter;
         public char Letter
         {

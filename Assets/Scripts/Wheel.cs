@@ -31,7 +31,7 @@ namespace WoW
         [SerializeField] private LineRenderer lineRenderer;
         List<RaycastResult> results = new List<RaycastResult>();
 
-        public static Action<string> OnWordWritten;
+        public static Action<string, RectTransform> OnWordWritten;
 
         void Awake()
         {
@@ -69,15 +69,38 @@ namespace WoW
                 {
                     if (result.gameObject.TryGetComponent(out WheelLetter wheelLetter))
                     {
-                        writtenWordRect.gameObject.SetActive(true);
-                        _wordWritten += wheelLetter.Letter;
-                        writtenWordTMP.SetText(_wordWritten);
-                        writtenWordRect.sizeDelta = new Vector2(_wordWritten.Length * 55, writtenWordRect.sizeDelta.y);
-                        wheelLetter.raycastImage.raycastTarget = false;
-                        lineRenderer.enabled = true;
-                        var screenToWorld = mainCam.ScreenToWorldPoint(wheelLetter.transform.position + Vector3.forward * 10);
-                        lineRenderer.SetPosition(lineRenderer.positionCount - 1, screenToWorld);
-                        lineRenderer.positionCount++;
+                        if (!wheelLetter.selected)
+                        {
+                            writtenWordRect.gameObject.SetActive(true);
+                            _wordWritten += wheelLetter.Letter;
+                            writtenWordTMP.SetText(_wordWritten);
+                            writtenWordRect.sizeDelta = new Vector2(_wordWritten.Length * 55, writtenWordRect.sizeDelta.y);
+                            lineRenderer.enabled = true;
+                            var screenToWorld = mainCam.ScreenToWorldPoint(wheelLetter.transform.position + Vector3.forward * 10);
+                            lineRenderer.SetPosition(lineRenderer.positionCount - 1, screenToWorld);
+                            lineRenderer.positionCount++;
+                            wheelLetter.selected = true;
+                        }
+                        else
+                        {
+                            if (_wordWritten.Length > 1 && wheelLetter.Letter == _wordWritten[^2])
+                            {
+                                for (int i = 0; i < wheelLetters.Count; i++) if (wheelLetters[i].Letter == _wordWritten[^1]) wheelLetters[i].selected = false;
+
+                                string newWordWritten = "";
+                                for (int i = 0; i < _wordWritten.Length - 1; i++)
+                                {
+                                    newWordWritten += _wordWritten[i];
+                                }
+
+                                _wordWritten = newWordWritten;
+                                writtenWordRect.sizeDelta = new Vector2(_wordWritten.Length * 55, writtenWordRect.sizeDelta.y);
+                                writtenWordTMP.SetText(_wordWritten);
+
+                                lineRenderer.positionCount--;
+                            }
+
+                        }
                     }
                 }
                 results.Clear();
@@ -87,13 +110,15 @@ namespace WoW
 
             if (Input.GetMouseButtonUp(0))
             {
-                if (_wordWritten != "") OnWordWritten?.Invoke(_wordWritten);
+                if (_wordWritten != "") OnWordWritten?.Invoke(_wordWritten, writtenWordRect);
                 _wordWritten = "";
-                writtenWordRect.gameObject.SetActive(false);
+
                 for (int i = 0; i < wheelLetters.Count; i++)
                 {
-                    wheelLetters[i].raycastImage.raycastTarget = true;
+                    wheelLetters[i].selected = false;
                 }
+
+                writtenWordRect.gameObject.SetActive(false);
                 lineRenderer.positionCount = 0;
             }
         }
